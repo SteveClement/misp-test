@@ -125,14 +125,9 @@ $redis = new Redis();
 try {
   $redis->connect("127.0.0.1",6379);
 } catch (Exception $e) {
-  echo "Cannot connect to redis server: ".$e->getMessage() . "<br />";
+  echo "Cannot connect to redis server: ". $e->getMessage() . "<br />";
   // (Condition)?(thing's to do if condition true):(thing's to do if condition false);
-  //(stest('127.0.0.1', '6379'))?(echo '<br />'):(echo 'redis port looks closed for PHP');
-  if (stest('127.0.0.1', '6379')) {
-    echo 'We can reach port 6379 (redis) from PHP, maybe the redis extension is missing.<br />';
-  } else {
-    echo 'Cannot reach port 6379 (redis) from PHP.<br />';
-  }
+  echo (stest('127.0.0.1', '6379') ? 'We can reach port 6379 (redis) from PHP, maybe the redis extension is missing.<br />' : 'Cannot reach port 6379 (redis) from PHP.<br />');
 }
 
 echo '<br />';
