@@ -177,14 +177,15 @@ function gpgDiag() {
       $gpg = new Crypt_GPG(array('homedir' => Configure::read('GnuPG.homedir'), 'gpgconf' => Configure::read('
 GnuPG.gpgconf'), 'binary' => (Configure::read('GnuPG.binary') ? Configure::read('GnuPG.binary') : '/usr/bin/gpg')));
     } catch (Exception $e) {
+      echo $e;
       $gpgStatus = 2;
       $continue = false;
     }
     if ($continue) {
       try {
         $key = $gpg->addSignKey(Configure::read('GnuPG.email'), Configure::read('GnuPG.password'));
-        print("<pre>".print_r($key,true)."</pre>");
       } catch (Exception $e) {
+        echo $e;
         $gpgStatus = 3;
         $continue = false;
       }
@@ -200,6 +201,9 @@ GnuPG.gpgconf'), 'binary' => (Configure::read('GnuPG.binary') ? Configure::read(
     }
   } else {
     $gpgStatus = 1;
+  }
+  if ($gpgStatus != 0) {
+    print("<pre>".print_r($key,true)."</pre>");
   }
   return $gpgStatus;
 }
@@ -267,15 +271,20 @@ try {
 
 echo '<br />';
 foreach ($execCmds as &$cmd) {
-  exec($cmd, $retArr, $retVal);
+  if ($cmd == 'kill') {
+    exec('sleep 1 & kill $$', $retArr, $retVal);
+  } else {
+    exec($cmd, $retArr, $retVal);
+  }
   if ($retVal == 127) {
     echo "'$cmd' does not exist.";
     echo '<br />';
   } else {
-  echo ($retVal != 0) ? "Command '$cmd' exited with '$retVal'" : "";
+  echo ($retVal != 0 and $retVal != 15) ? "Command '$cmd' exited with '$retVal'" : "";
   }
   //echo var_dump($retArr);
 }
+
 
 echo '<br />';
 echo '<br />';
