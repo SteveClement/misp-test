@@ -159,14 +159,49 @@ function humanSize($Bytes)
 
 // check if extension is available
 function checkExtensions ($extensions) {
-	//$extensions = array('redis', 'gd');
-	$results = array();
-	$results['phpversion'] = phpversion();
-	foreach ($extensions as $extension) {
-		$results['extensions'][$extension] = extension_loaded($extension);
-	}
-	return $results;
-	return json_encode($results);
+  $results = array();
+  $results['phpversion'] = phpversion();
+  foreach ($extensions as $extension) {
+    $results['extensions'][$extension] = extension_loaded($extension);
+  }
+  return $results;
+  return json_encode($results);
+}
+
+// Diagnose gpg issues
+function gpgDiag() {
+  if (Configure::read('GnuPG.email') && Configure::read('GnuPG.homedir')) {
+    $continue = true;
+    try {
+      require_once 'Crypt/GPG.php';
+      $gpg = new Crypt_GPG(array('homedir' => Configure::read('GnuPG.homedir'), 'gpgconf' => Configure::read('
+GnuPG.gpgconf'), 'binary' => (Configure::read('GnuPG.binary') ? Configure::read('GnuPG.binary') : '/usr/bin/gpg')));
+    } catch (Exception $e) {
+      $gpgStatus = 2;
+      $continue = false;
+    }
+    if ($continue) {
+      try {
+        $key = $gpg->addSignKey(Configure::read('GnuPG.email'), Configure::read('GnuPG.password'));
+        print("<pre>".print_r($key,true)."</pre>");
+      } catch (Exception $e) {
+        $gpgStatus = 3;
+        $continue = false;
+      }
+    }
+    if ($continue) {
+      try {
+        $gpgStatus = 0;
+        $signed = $gpg->sign('test', Crypt_GPG::SIGN_MODE_CLEAR);
+      } catch (Exception $e) {
+        echo $e;
+        $gpgStatus = 4;
+      }
+    }
+  } else {
+    $gpgStatus = 1;
+  }
+  return $gpgStatus;
 }
 
 // recursively check directory size
@@ -202,7 +237,7 @@ if (php_sapi_name() == "cli") {
   $phpInfo=parse_phpinfo();
   //header('Content-Type: application/json');
   //echo json_encode($phpInfo, JSON_PRETTY_PRINT);
-  $extensions=array('redis', 'gd');
+  $extensions=array('redis', 'gd', 'gnupg');
   $extJSON=checkExtensions($extensions);
   foreach ($extensions as $extension) {
     if ($extJSON['extensions'][$extension] != 1) {
@@ -251,7 +286,10 @@ echo (defined(WWW_ROOT) ? "WWW_ROOT is NOT set<br />" : "WWW_ROOT is set: " . WW
 echo (defined(WEBROOT_DIR) ? "WEBROOT_DIR is NOT set<br />" : "WEBROOT_DIR is set: " . WEBROOT_DIR . "<br />");
 echo (defined(ROOT) ? "ROOT is NOT set<br />" : "ROOT is set: " . ROOT . "<br />");
 echo '<br />';
+$gpgStatus = 0;
+
 echo '<br />';
+echo gpgDiag();
 echo '<br />';
 echo '<br />';
 phpinfo();
