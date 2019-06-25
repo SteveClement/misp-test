@@ -1,5 +1,70 @@
 <?php
 
+// Cake Specifics
+/**
+ * Use the DS to separate the directories in other defines
+ */
+if (!defined('DS')) {
+	define('DS', DIRECTORY_SEPARATOR);
+}
+/**
+ * These defines should only be edited if you have cake installed in
+ * a directory layout other than the way it is distributed.
+ * When using custom settings be sure to use the DS and do not add a trailing DS.
+ */
+/**
+ * The full path to the directory which holds "app", WITHOUT a trailing DS.
+ *
+ */
+if (!defined('ROOT')) {
+	define('ROOT', dirname(dirname(dirname(__FILE__))));
+}
+/**
+ * The actual directory name for the "app".
+ *
+ */
+if (!defined('APP_DIR')) {
+	define('APP_DIR', basename(dirname(dirname(__FILE__))));
+}
+/**
+ * The absolute path to the "cake" directory, WITHOUT a trailing DS.
+ *
+ * Un-comment this line to specify a fixed path to CakePHP.
+ * This should point at the directory containing `Cake`.
+ *
+ * For ease of development CakePHP uses PHP's include_path.  If you
+ * cannot modify your include_path set this value.
+ *
+ * Leaving this constant undefined will result in it being defined in Cake/bootstrap.php
+ */
+	define('CAKE_CORE_INCLUDE_PATH', ROOT . DS . APP_DIR . DS .'Lib' . DS . 'cakephp' . DS . 'lib');
+/**
+ * Editing below this line should NOT be necessary.
+ * Change at your own risk.
+ *
+ */
+if (!defined('WEBROOT_DIR')) {
+	define('WEBROOT_DIR', basename(dirname(__FILE__)));
+}
+if (!defined('WWW_ROOT')) {
+	define('WWW_ROOT', dirname(__FILE__) . DS);
+}
+if (!defined('CAKE_CORE_INCLUDE_PATH')) {
+	if (function_exists('ini_set')) {
+		ini_set('include_path', ROOT . DS . 'lib' . PATH_SEPARATOR . ini_get('include_path'));
+	}
+	if (!include ('Cake' . DS . 'bootstrap.php')) {
+		$failed = true;
+	}
+} else {
+	if (!include (CAKE_CORE_INCLUDE_PATH . DS . 'Cake' . DS . 'bootstrap.php')) {
+		$failed = true;
+	}
+}
+if (!empty($failed)) {
+	trigger_error("CakePHP core could not be found.  Check the value of CAKE_CORE_INCLUDE_PATH in APP/webroot/index.php.  It should point to the directory containing your " . DS . "cake core directory and your " . DS . "vendors root directory.", E_USER_ERROR);
+}
+
 // Display all errors
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
@@ -7,6 +72,41 @@ ini_set('display_errors', 1);
 /** variables_begin **/
 
 $PATH_TO_MISP='/var/www/MISP';
+
+$wrFiles=array(
+  '/tmp',
+  '/var/www/MISP/app/tmp',
+  '/var/www/MISP/app/files',
+  '/var/www/MISP/app/files/scripts/tmp',
+  '/var/www/MISP/app/tmp/csv_all',
+  '/var/www/MISP/app/tmp/csv_sig',
+  '/var/www/MISP/app/tmp/md5',
+  '/var/www/MISP/app/tmp/sha1',
+  '/var/www/MISP/app/tmp/snort',
+  '/var/www/MISP/app/tmp/suricata',
+  '/var/www/MISP/app/tmp/text',
+  '/var/www/MISP/app/tmp/xml',
+  '/var/www/MISP/app/tmp/files',
+  '/var/www/MISP/app/tmp/logs',
+  '/var/www/MISP/app/tmp/bro',
+  '/var/www/MISP/app/Config/config.php'
+);
+
+$reFiles=array(
+  '/var/www/MISP/app/files/scripts/stixtest.py'
+);
+
+$execCmds=array(
+  'git status',
+  'python',
+  'gpg --version',
+  'whoami',
+  'ps',
+  APP . 'Console' . DS . 'cake admin getSetting GnuPG.binary',
+  'awk -V',
+  'grep -V',
+  'kill'
+);
 
 /** variables_end **/
 
@@ -127,11 +227,29 @@ try {
 } catch (Exception $e) {
   echo "Cannot connect to redis server: ". $e->getMessage() . "<br />";
   // (Condition)?(thing's to do if condition true):(thing's to do if condition false);
-  echo (stest('127.0.0.1', '6379') ? 'We can reach port 6379 (redis) from PHP, maybe the redis extension is missing.<br />' : 'Cannot reach port 6379 (redis) from PHP.<br />');
+  echo (stest('127.0.0.1', '6379') ? 'We can reach port 6379 (redis) from PHP, maybe the redis extension is missing.<br />' : 'Cannot reach port 6379 (redis) from PHP.<br />Under CentOS/RHEL you might need to:<br />sudo setsebool -P httpd_can_network_connect on<br />');
+}
+
+echo '<br />';
+foreach ($execCmds as &$cmd) {
+  exec($cmd, $retArr, $retVal);
+  if ($retVal == 127) {
+    echo "'$cmd' does not exist.";
+    echo '<br />';
+  } else {
+  echo ($retVal != 0) ? "Command '$cmd' exited with '$retVal'" : "";
+  }
+  //echo var_dump($retArr);
 }
 
 echo '<br />';
 echo '<br />';
+echo (defined(DS) ? "DS is NOT set<br />" : "DS is set: ". DS . "<br />");
+echo (defined(APP) ? "APP is NOT set<br />" : "APP is set: " . APP . "<br />");
+echo (defined(APP_DIR) ? "APP_DIR is NOT set<br />" : "APP_DIR is set: " . APP_DIR . "<br />");
+echo (defined(WWW_ROOT) ? "WWW_ROOT is NOT set<br />" : "WWW_ROOT is set: " . WWW_ROOT . "<br />");
+echo (defined(WEBROOT_DIR) ? "WEBROOT_DIR is NOT set<br />" : "WEBROOT_DIR is set: " . WEBROOT_DIR . "<br />");
+echo (defined(ROOT) ? "ROOT is NOT set<br />" : "ROOT is set: " . ROOT . "<br />");
 echo '<br />';
 echo '<br />';
 echo '<br />';
