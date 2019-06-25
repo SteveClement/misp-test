@@ -1,3 +1,29 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head>
+<style type="text/css">
+body {background-color: #fff; color: #222; font-family: sans-serif;}
+pre {margin: 0; font-family: monospace;}
+a:link {color: #009; text-decoration: none; background-color: #fff;}
+a:hover {text-decoration: underline;}
+table {border-collapse: collapse; border: 0; width: 934px; box-shadow: 1px 2px 3px #ccc;}
+.center {text-align: center;}
+.center table {margin: 1em auto; text-align: left;}
+.center th {text-align: center !important;}
+td, th {border: 1px solid #666; font-size: 75%; vertical-align: baseline; padding: 4px 5px;}
+h1 {font-size: 150%;}
+h2 {font-size: 125%;}
+.p {text-align: left;}
+.e {background-color: #ccf; width: 300px; font-weight: bold;}
+.h {background-color: #99c; font-weight: bold;}
+.v {background-color: #ddd; max-width: 300px; overflow-x: auto; word-wrap: break-word;}
+.v i {color: #999;}
+img {float: right; border: 0;}
+hr {width: 934px; background-color: #ccc; border: 0; height: 1px;}
+</style>
+<title>misp-test</title><meta name="ROBOTS" content="NOINDEX,NOFOLLOW,NOARCHIVE" /></head>
+<body>
+
+
 <?php
 
 // Cake Specifics
@@ -70,8 +96,6 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
 /** variables_begin **/
-
-$PATH_TO_MISP='/var/www/MISP';
 
 $wrFiles=array(
   '/tmp',
@@ -168,6 +192,20 @@ function checkExtensions ($extensions) {
   return json_encode($results);
 }
 
+// Diagnose ZMQ
+function zmqRunning() {
+  App::uses('File', 'Utility');
+  $pidFile = new File(APP . 'files' . DS . 'scripts' . DS . 'mispzmq' . DS . 'mispzmq.pid');
+  $pid = $pidFile->read(true, 'r');
+  if ($pid === false || $pid === '') {
+    return false;
+  }
+  if (!is_numeric($pid)) {
+    throw new Exception('Internal error (invalid PID file for the MISP zmq script)');
+  }
+  return $pid;
+}
+
 // Diagnose gpg issues
 function gpgDiag() {
   if (Configure::read('GnuPG.email') && Configure::read('GnuPG.homedir')) {
@@ -203,7 +241,9 @@ GnuPG.gpgconf'), 'binary' => (Configure::read('GnuPG.binary') ? Configure::read(
     $gpgStatus = 1;
   }
   if ($gpgStatus != 0) {
-    print("<pre>".print_r($key,true)."</pre>");
+    if (isset($key)) {
+      print("<pre>".print_r($key,true)."</pre>");
+    }
   }
   return $gpgStatus;
 }
@@ -251,25 +291,42 @@ if (php_sapi_name() == "cli") {
 
 }
 
+echo "<h1>General info</h1>";
+
+$PATH_TO_MISP=ROOT;
+
 $folders=array($PATH_TO_MISP."/app/tmp/logs",$PATH_TO_MISP."/venv",$PATH_TO_MISP."/files");
 
-echo '$PATH_TO_MISP->' . $PATH_TO_MISP . '<br />';
+echo '$PATH_TO_MISP -> <b>' . $PATH_TO_MISP . '</b> (also ROOT)<br />';
+echo '$PATH_TO_MISP has <b>' . humanSize(disk_free_space($PATH_TO_MISP)) . '</b> of free disk space<br />';
 echo '<br />';
-echo '$PATH_TO_MISP has ' . humanSize(disk_free_space($PATH_TO_MISP)) . ' of free disk space';
+echo '$PATH_TO_MISP has a total size of <b>' . humanSize(folderSize($PATH_TO_MISP)) . "</b><br />";
 echo '<br />';
-echo '$PATH_TO_MISP has a size of ' . humanSize(folderSize($PATH_TO_MISP));
-echo '<br />';
-echo '<br />';
+echo 'ROOT/PyMISP has a size of <b>' . humanSize(folderSize($PATH_TO_MISP. DS . "PyMISP")) . "</b><br />";
+echo 'ROOT/app has a size of <b>' . humanSize(folderSize($PATH_TO_MISP. DS . "app")) . "</b><br />";
+echo 'ROOT/app/files has a size of <b>' . humanSize(folderSize($PATH_TO_MISP. DS . "app/files")) . "</b><br />";
+echo 'ROOT/venv has a size of <b>' . humanSize(folderSize($PATH_TO_MISP. DS . "venv")) . "</b><br />";
+
+echo "<h2>Checking if various 'cake' specific variables are set</h2>";
+echo (defined(DS) ? "DS is NOT set<br />" : "DS is set: <b>". DS . "</b><br />");
+echo (defined(APP) ? "APP is NOT set<br />" : "APP is set: <b>" . APP . "</b><br />");
+echo (defined(APP_DIR) ? "APP_DIR is NOT set<br />" : "APP_DIR is set: <b>" . APP_DIR . "</b><br />");
+echo (defined(WWW_ROOT) ? "WWW_ROOT is NOT set<br />" : "WWW_ROOT is set: <b>" . WWW_ROOT . "</b><br />");
+echo (defined(WEBROOT_DIR) ? "WEBROOT_DIR is NOT set<br />" : "WEBROOT_DIR is set: <b>" . WEBROOT_DIR . "</b><br />");
+echo (defined(ROOT) ? "ROOT is NOT set<br />" : "ROOT is set: <b>" . ROOT . "</b><br />");
+
+echo "<h2>Testing redis</h2>";
 $redis = new Redis();
 try {
   $redis->connect("127.0.0.1",6379);
+  echo "Redis <b>OK</b><br />";
 } catch (Exception $e) {
   echo "Cannot connect to redis server: ". $e->getMessage() . "<br />";
   // (Condition)?(thing's to do if condition true):(thing's to do if condition false);
   echo (stest('127.0.0.1', '6379') ? 'We can reach port 6379 (redis) from PHP, maybe the redis extension is missing.<br />' : 'Cannot reach port 6379 (redis) from PHP.<br />Under CentOS/RHEL you might need to:<br />sudo setsebool -P httpd_can_network_connect on<br />');
 }
 
-echo '<br />';
+echo "<h2>Testing exec() calls</h2>";
 foreach ($execCmds as &$cmd) {
   if ($cmd == 'kill') {
     exec('sleep 1 & kill $$', $retArr, $retVal);
@@ -280,27 +337,16 @@ foreach ($execCmds as &$cmd) {
     echo "'$cmd' does not exist.";
     echo '<br />';
   } else {
-  echo ($retVal != 0 and $retVal != 15) ? "Command '$cmd' exited with '$retVal'" : "";
+  echo ($retVal != 0 and $retVal != 15) ? "Command '$cmd' exited with '$retVal'" : "$cmd <b>OK</b><br />";
   }
-  //echo var_dump($retArr);
 }
 
+echo "<h2>Testing GnuPG</h2>";
+echo "GnuPG diagnostics error code: <b>" . gpgDiag() . "</b><br />";
 
-echo '<br />';
-echo '<br />';
-echo (defined(DS) ? "DS is NOT set<br />" : "DS is set: ". DS . "<br />");
-echo (defined(APP) ? "APP is NOT set<br />" : "APP is set: " . APP . "<br />");
-echo (defined(APP_DIR) ? "APP_DIR is NOT set<br />" : "APP_DIR is set: " . APP_DIR . "<br />");
-echo (defined(WWW_ROOT) ? "WWW_ROOT is NOT set<br />" : "WWW_ROOT is set: " . WWW_ROOT . "<br />");
-echo (defined(WEBROOT_DIR) ? "WEBROOT_DIR is NOT set<br />" : "WEBROOT_DIR is set: " . WEBROOT_DIR . "<br />");
-echo (defined(ROOT) ? "ROOT is NOT set<br />" : "ROOT is set: " . ROOT . "<br />");
-echo '<br />';
-$gpgStatus = 0;
-
-echo '<br />';
-echo gpgDiag();
-echo '<br />';
-echo '<br />';
-phpinfo();
+echo "<h2>Testing ZMQ</h2>";
+echo "ZMQ running with PID (from file) number: <b>" . zmqRunning() . "</b><br />";
+//phpinfo();
 
 ?>
+</body></html>
