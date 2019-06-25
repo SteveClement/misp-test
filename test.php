@@ -1,5 +1,18 @@
 <?php
 
+// Display all errors
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
+/** variables_begin **/
+
+$PATH_TO_MISP='/var/www/MISP';
+
+/** variables_end **/
+
+
+/** functions_begin **/
+
 /**
  * 解析 PHP info
  *
@@ -31,6 +44,7 @@ function parse_phpinfo() {
     return $r;
 }
 
+// Return human readable sizes
 function humanSize($Bytes)
 {
   $Type=array("", "kilo", "mega", "giga", "tera", "peta", "exa", "zetta", "yotta");
@@ -43,6 +57,7 @@ function humanSize($Bytes)
   return("".round($Bytes, 2)." ".$Type[$Index]."bytes");
 }
 
+// check if extension is available
 function checkExtensions ($extensions) {
 	//$extensions = array('redis', 'gd');
 	$results = array();
@@ -54,6 +69,7 @@ function checkExtensions ($extensions) {
 	return json_encode($results);
 }
 
+// recursively check directory size
 function folderSize ($dir)
 {
     $size = 0;
@@ -63,7 +79,17 @@ function folderSize ($dir)
     return $size;
 }
 
-$PATH_TO_MISP='/var/www/MISP';
+function stest($ip, $portt) {
+    $fp = @fsockopen($ip, $portt, $errno, $errstr, 0.1);
+    if (!$fp) {
+        return false;
+    } else {
+        fclose($fp);
+        return true;
+    }
+}
+
+/** functions_end **/
 
 if (php_sapi_name() == "cli") {
   // In cli-mode
@@ -87,8 +113,34 @@ if (php_sapi_name() == "cli") {
 }
 
 $folders=array($PATH_TO_MISP."/app/tmp/logs",$PATH_TO_MISP."/venv",$PATH_TO_MISP."/files");
-echo humanSize(disk_free_space($PATH_TO_MISP));
+
+echo '$PATH_TO_MISP->' . $PATH_TO_MISP . '<br />';
 echo '<br />';
-echo humanSize(folderSize($PATH_TO_MISP));
+echo '$PATH_TO_MISP has ' . humanSize(disk_free_space($PATH_TO_MISP)) . ' of free disk space';
+echo '<br />';
+echo '$PATH_TO_MISP has a size of ' . humanSize(folderSize($PATH_TO_MISP));
+echo '<br />';
+echo '<br />';
+$redis = new Redis();
+try {
+  $redis->connect("127.0.0.1",6379);
+} catch (Exception $e) {
+  echo "Cannot connect to redis server: ".$e->getMessage() . "<br />";
+  // (Condition)?(thing's to do if condition true):(thing's to do if condition false);
+  //(stest('127.0.0.1', '6379'))?(echo '<br />'):(echo 'redis port looks closed for PHP');
+  if (stest('127.0.0.1', '6379')) {
+    echo 'We can reach port 6379 (redis) from PHP, maybe the redis extension is missing.<br />';
+  } else {
+    echo 'Cannot reach port 6379 (redis) from PHP.<br />';
+  }
+}
+
+echo '<br />';
+echo '<br />';
+echo '<br />';
+echo '<br />';
+echo '<br />';
+echo '<br />';
+phpinfo();
 
 ?>
