@@ -268,6 +268,19 @@ function stest($ip, $portt) {
     }
 }
 
+function check($proxy=null) {
+        $proxy=  explode(':', $proxy);
+        $host = $proxy[0]; 
+        $port = $proxy[1]; 
+        $waitTimeoutInSeconds = 10; 
+        if($fp = @fsockopen($host,$port,$errCode,$errStr,$waitTimeoutInSeconds)){   
+           return 'yes';
+        } else {
+           return 'false';
+        } 
+        fclose($fp);
+}
+
 /** functions_end **/
 
 if (php_sapi_name() == "cli") {
@@ -285,7 +298,7 @@ if (php_sapi_name() == "cli") {
   $extJSON=checkExtensions($extensions);
   foreach ($extensions as $extension) {
     if ($extJSON['extensions'][$extension] != 1) {
-      echo $extension . " is missing";
+      echo $extension . " is missing<br />";
     }
   }
 
@@ -347,6 +360,8 @@ echo "GnuPG diagnostics error code: <b>" . gpgDiag() . "</b><br />";
 echo "<h2>Testing ZMQ</h2>";
 echo "ZMQ running with PID (from file) number: <b>" . zmqRunning() . "</b><br />";
 //phpinfo();
+
+echo check("http://localhost:8888")
 
 ?>
 </body></html>
