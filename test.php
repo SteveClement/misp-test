@@ -311,11 +311,17 @@ echo "<h1>General info</h1>";
 
 $PATH_TO_MISP=ROOT;
 
+$php_ini = php_ini_loaded_file();
+$phprec = '7.2';
+$phpmin = '7.0';
+
 $folders=array($PATH_TO_MISP."/app/tmp/logs",$PATH_TO_MISP."/venv",$PATH_TO_MISP."/files");
 
+echo 'Current PHP version: <b>' . phpversion() . "</b> MISP requires <b>=" .$phpmin. "</b> recommended: <b>". $phprec ."</b> <br />";
+echo 'php.ini location: <b>'. $php_ini . '</b><br />';
+echo "<font color='red'><b>Please note that the we will be dropping support for Python 2.7 and PHP 7.1 as of 2020-01-01 and are henceforth considered deprecated (but supported until the end of 2019). Both of these versions will by then reached End of Life and will become a liability. Furthermore, by dropping support for these outdated versions of the languages, we'll be able to phase out support for legacy code that exists solely to support them. Make sure that you plan ahead accordingly. More info: More info: <a href='https://secure.php.net/supported-versions.php'>PHP</a>, <a href='https://www.python.org/dev/peps/pep-0373'>Python</a>.</b></font><br /><br />";
 echo '$PATH_TO_MISP -> <b>' . $PATH_TO_MISP . '</b> (also ROOT)<br />';
 echo '$PATH_TO_MISP has <b>' . humanSize(disk_free_space($PATH_TO_MISP)) . '</b> of free disk space<br />';
-echo '<br />';
 echo '$PATH_TO_MISP has a total size of <b>' . humanSize(folderSize($PATH_TO_MISP)) . "</b><br />";
 echo '<br />';
 echo 'ROOT/PyMISP has a size of <b>' . humanSize(folderSize($PATH_TO_MISP. DS . "PyMISP")) . "</b><br />";
