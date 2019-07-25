@@ -336,6 +336,7 @@ echo '<br />';
 echo 'ROOT/PyMISP has a size of <b>' . humanSize(folderSize($PATH_TO_MISP. DS . "PyMISP")) . "</b><br />";
 echo 'ROOT/app has a size of <b>' . humanSize(folderSize($PATH_TO_MISP. DS . "app")) . "</b><br />";
 echo 'ROOT/app/files has a size of <b>' . humanSize(folderSize($PATH_TO_MISP. DS . "app/files")) . "</b><br />";
+echo 'ROOT/app/tmp/logs has a size of <b>' . humanSize(folderSize($PATH_TO_MISP. DS . "app/tmp/logs")) . "</b><br />";
 echo 'ROOT/venv has a size of <b>' . humanSize(folderSize($PATH_TO_MISP. DS . "venv")) . "</b><br />";
 
 echo "<h2>Checking if various 'cake' specific variables are set</h2>";
