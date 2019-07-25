@@ -1,28 +1,31 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml"><head>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
 <style type="text/css">
-body {background-color: #fff; color: #222; font-family: sans-serif;}
-pre {margin: 0; font-family: monospace;}
-a:link {color: #009; text-decoration: none; background-color: #fff;}
-a:hover {text-decoration: underline;}
-table {border-collapse: collapse; border: 0; width: 934px; box-shadow: 1px 2px 3px #ccc;}
-.center {text-align: center;}
-.center table {margin: 1em auto; text-align: left;}
-.center th {text-align: center !important;}
-td, th {border: 1px solid #666; font-size: 75%; vertical-align: baseline; padding: 4px 5px;}
-h1 {font-size: 150%;}
-h2 {font-size: 125%;}
-.p {text-align: left;}
-.e {background-color: #ccf; width: 300px; font-weight: bold;}
-.h {background-color: #99c; font-weight: bold;}
-.v {background-color: #ddd; max-width: 300px; overflow-x: auto; word-wrap: break-word;}
-.v i {color: #999;}
-img {float: right; border: 0;}
-hr {width: 934px; background-color: #ccc; border: 0; height: 1px;}
+  body {background-color: #fff; color: #222; font-family: sans-serif;}
+  pre {margin: 0; font-family: monospace;}
+  a:link {color: #009; text-decoration: none; background-color: #fff;}
+  a:hover {text-decoration: underline;}
+  table {border-collapse: collapse; border: 0; width: 934px; box-shadow: 1px 2px 3px #ccc;}
+  .center {text-align: center;}
+  .center table {margin: 1em auto; text-align: left;}
+  .center th {text-align: center !important;}
+  td, th {border: 1px solid #666; font-size: 75%; vertical-align: baseline; padding: 4px 5px;}
+  h1 {font-size: 150%;}
+  h2 {font-size: 125%;}
+  .p {text-align: left;}
+  .e {background-color: #ccf; width: 300px; font-weight: bold;}
+  .h {background-color: #99c; font-weight: bold;}
+  .v {background-color: #ddd; max-width: 300px; overflow-x: auto; word-wrap: break-word;}
+  .v i {color: #999;}
+  img {float: right; border: 0;}
+  hr {width: 934px; background-color: #ccc; border: 0; height: 1px;}
 </style>
-<title>misp-test</title><meta name="ROBOTS" content="NOINDEX,NOFOLLOW,NOARCHIVE" /></head>
-<body>
 
+<title>misp-test</title><meta name="ROBOTS" content="NOINDEX,NOFOLLOW,NOARCHIVE" />
+</head>
+
+<body>
 
 <?php
 
@@ -31,7 +34,7 @@ hr {width: 934px; background-color: #ccc; border: 0; height: 1px;}
  * Use the DS to separate the directories in other defines
  */
 if (!defined('DS')) {
-	define('DS', DIRECTORY_SEPARATOR);
+  define('DS', DIRECTORY_SEPARATOR);
 }
 /**
  * These defines should only be edited if you have cake installed in
@@ -43,14 +46,14 @@ if (!defined('DS')) {
  *
  */
 if (!defined('ROOT')) {
-	define('ROOT', dirname(dirname(dirname(__FILE__))));
+  define('ROOT', dirname(dirname(dirname(__FILE__))));
 }
 /**
  * The actual directory name for the "app".
  *
  */
 if (!defined('APP_DIR')) {
-	define('APP_DIR', basename(dirname(dirname(__FILE__))));
+  define('APP_DIR', basename(dirname(dirname(__FILE__))));
 }
 /**
  * The absolute path to the "cake" directory, WITHOUT a trailing DS.
@@ -63,32 +66,32 @@ if (!defined('APP_DIR')) {
  *
  * Leaving this constant undefined will result in it being defined in Cake/bootstrap.php
  */
-	define('CAKE_CORE_INCLUDE_PATH', ROOT . DS . APP_DIR . DS .'Lib' . DS . 'cakephp' . DS . 'lib');
+  define('CAKE_CORE_INCLUDE_PATH', ROOT . DS . APP_DIR . DS .'Lib' . DS . 'cakephp' . DS . 'lib');
 /**
  * Editing below this line should NOT be necessary.
  * Change at your own risk.
  *
  */
 if (!defined('WEBROOT_DIR')) {
-	define('WEBROOT_DIR', basename(dirname(__FILE__)));
+  define('WEBROOT_DIR', basename(dirname(__FILE__)));
 }
 if (!defined('WWW_ROOT')) {
-	define('WWW_ROOT', dirname(__FILE__) . DS);
+  define('WWW_ROOT', dirname(__FILE__) . DS);
 }
 if (!defined('CAKE_CORE_INCLUDE_PATH')) {
-	if (function_exists('ini_set')) {
-		ini_set('include_path', ROOT . DS . 'lib' . PATH_SEPARATOR . ini_get('include_path'));
-	}
-	if (!include ('Cake' . DS . 'bootstrap.php')) {
-		$failed = true;
-	}
+  if (function_exists('ini_set')) {
+    ini_set('include_path', ROOT . DS . 'lib' . PATH_SEPARATOR . ini_get('include_path'));
+  }
+  if (!include ('Cake' . DS . 'bootstrap.php')) {
+    $failed = true;
+  }
 } else {
-	if (!include (CAKE_CORE_INCLUDE_PATH . DS . 'Cake' . DS . 'bootstrap.php')) {
-		$failed = true;
-	}
+  if (!include (CAKE_CORE_INCLUDE_PATH . DS . 'Cake' . DS . 'bootstrap.php')) {
+    $failed = true;
+  }
 }
 if (!empty($failed)) {
-	trigger_error("CakePHP core could not be found.  Check the value of CAKE_CORE_INCLUDE_PATH in APP/webroot/index.php.  It should point to the directory containing your " . DS . "cake core directory and your " . DS . "vendors root directory.", E_USER_ERROR);
+  trigger_error("CakePHP core could not be found.  Check the value of CAKE_CORE_INCLUDE_PATH in APP/webroot/index.php.  It should point to the directory containing your " . DS . "cake core directory and your " . DS . "vendors root directory.", E_USER_ERROR);
 }
 
 // Display all errors
@@ -329,9 +332,13 @@ echo (defined(WEBROOT_DIR) ? "WEBROOT_DIR is NOT set<br />" : "WEBROOT_DIR is se
 echo (defined(ROOT) ? "ROOT is NOT set<br />" : "ROOT is set: <b>" . ROOT . "</b><br />");
 
 echo "<h2>Testing redis</h2>";
+(Configure::read('MISP.redis_host'))?($redisHost=Configure::read('MISP.redis_host')):($redisHost='127.0.0.1');
+(Configure::read('MISP.redis_port'))?($redisPort=Configure::read('MISP.redis_port')):($redisPort=6379);
+(Configure::read('MISP.redis_database'))?($redisDB=Configure::read('MISP.redis_database')):($redisDB=13);
+echo "Configured redis host/port/db: <b>" . $redisHost . ":" . $redisPort . "/" . $redisDB . "</b><br />";
 $redis = new Redis();
 try {
-  $redis->connect("127.0.0.1",6379);
+  $redis->connect($redisHost,$redisPort);
   echo "Redis <b>OK</b><br />";
 } catch (Exception $e) {
   echo "Cannot connect to redis server: ". $e->getMessage() . "<br />";
