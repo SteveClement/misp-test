@@ -171,6 +171,47 @@ function parse_phpinfo() {
     return $r;
 }
 
+function freeMem() {
+  if (is_readable("/proc/meminfo")) {
+    $stats = @file_get_contents("/proc/meminfo");
+
+    if ($stats !== false) {
+      // Separate lines
+      $stats = str_replace(array("\r\n", "\n\r", "\r"), "\n", $stats);
+      $stats = explode("\n", $stats);
+
+      // Separate values and find correct lines for total and free mem
+      foreach ($stats as $statLine) {
+        $statLineData = explode(":", trim($statLine));
+
+        //
+        // Extract size (TODO: It seems that (at least) the two values for total and free memory have the unit "kB" always. Is this correct?
+        //
+
+        // Total memory
+        if (count($statLineData) == 2 && trim($statLineData[0]) == "MemTotal") {
+          $memoryTotal = trim($statLineData[1]);
+          $memoryTotal = explode(" ", $memoryTotal);
+          $memoryTotal = $memoryTotal[0];
+          $memoryTotal *= 1024;  // convert from kibibytes to bytes
+        }
+
+        // Free memory
+        if (count($statLineData) == 2 && trim($statLineData[0]) == "MemFree") {
+          $memoryFree = trim($statLineData[1]);
+          $memoryFree = explode(" ", $memoryFree);
+          $memoryFree = $memoryFree[0];
+          $memoryFree *= 1024;  // convert from kibibytes to bytes
+        }
+      }
+    } else {
+      return false;
+    }
+    return array($memoryTotal, $memoryFree);
+  }
+  return false;
+}
+
 // Return human readable sizes
 function humanSize($Bytes)
 {
@@ -315,6 +356,8 @@ $php_ini = php_ini_loaded_file();
 $phprec = '7.2';
 $phpmin = '7.0';
 
+$freeMemory = freeMem();
+
 $folders=array($PATH_TO_MISP."/app/tmp/logs",$PATH_TO_MISP."/venv",$PATH_TO_MISP."/files");
 
 echo 'Current PHP version: <b>' . phpversion() . "</b> MISP requires <b>&gt;=" .$phpmin. "</b> recommended: <b>". $phprec ."</b> <br />";
@@ -327,6 +370,11 @@ if (phpversion() <= '7.1') {
   $difference = $cdate - $today;
   if ($difference < 0) { $difference = 0; }
   echo "<br />You are out of date and there are <font color='red'><b>". floor($difference/60/60/24)." </font></b>days remaining until high-risk.<br /><br />";
+}
+
+if ($freeMemory != false) {
+  echo "Total Memory: <b>" . humanSize($freeMemory[0]). "</b><br />";
+  echo "Free  Memory: <b>" . humanSize($freeMemory[1]). "</b><br /><br />";
 }
 
 echo '$PATH_TO_MISP -> <b>' . $PATH_TO_MISP . '</b> (also ROOT)<br />';
