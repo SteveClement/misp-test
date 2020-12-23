@@ -431,12 +431,11 @@ echo "GnuPG diagnostics error code: <b>" . gpgDiag() . "</b><br />";
 
 echo "<h2>Testing ZMQ</h2>";
 echo "ZMQ running with PID (from file) number: <b>" . zmqRunning() . "</b><br />";
-//phpinfo();
-phpinfo(INFO_MODULES);
 
 echo check("http://localhost:8888");
 
 echo "Using the following web server: " . $_SERVER["SERVER_SOFTWARE"];
 
+phpinfo(INFO_MODULES);
 ?>
 </body></html>
