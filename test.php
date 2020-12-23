@@ -432,9 +432,9 @@ echo "GnuPG diagnostics error code: <b>" . gpgDiag() . "</b><br />";
 echo "<h2>Testing ZMQ</h2>";
 echo "ZMQ running with PID (from file) number: <b>" . zmqRunning() . "</b><br />";
 
-echo check("http://localhost:8888");
+echo "Checking localhost:8888 -> <b>" . check("http://localhost:8888") . "</b><br />;
 
-echo "Using the following web server: " . $_SERVER["SERVER_SOFTWARE"];
+echo "Using the following web server: <b>" . $_SERVER["SERVER_SOFTWARE"] . "</b><br />";
 
 phpinfo(INFO_MODULES);
 ?>
