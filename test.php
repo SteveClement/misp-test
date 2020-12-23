@@ -126,6 +126,7 @@ $reFiles=array(
 $execCmds=array(
   'git status',
   'python',
+  'python3',
   'gpg --version',
   'whoami',
   'ps',
