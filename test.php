@@ -434,7 +434,7 @@ echo "ZMQ running with PID (from file) number: <b>" . zmqRunning() . "</b><br />
 //phpinfo();
 phpinfo(INFO_MODULES);
 
-echo check("http://localhost:8888")
+echo check("http://localhost:8888");
 
 echo "Using the following web server: " . $_SERVER["SERVER_SOFTWARE"];
 
