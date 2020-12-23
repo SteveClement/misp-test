@@ -432,10 +432,13 @@ echo "GnuPG diagnostics error code: <b>" . gpgDiag() . "</b><br />";
 echo "<h2>Testing ZMQ</h2>";
 echo "ZMQ running with PID (from file) number: <b>" . zmqRunning() . "</b><br />";
 
-echo "Checking localhost:8888 -> <b>" . check("http://localhost:8888") . "</b><br />;
+echo "<h2>Testing Port 8888</h2>";
+echo "Checking localhost:8888 -> <b>" . check("http://localhost:8888") . "</b><br />";
 
+echo "<h2>Detecting Web Server</h2>";
 echo "Using the following web server: <b>" . $_SERVER["SERVER_SOFTWARE"] . "</b><br />";
 
+echo "<h2>Php Modules loaded</h2>";
 phpinfo(INFO_MODULES);
 ?>
 </body></html>
